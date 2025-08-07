@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カードめくりゲーム（外部画像版）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .perspective {
+            perspective: 1000px;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+        }
+        .is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-size: cover;
+            background-position: center;
+        }
+        /* カードの裏面: 外部画像を指定 */
+        .card-back {
+            /* ★★★ ご自身のファイルパスに書き換えてください ★★★ */
+            background-image: url('https://placehold.co/200x280/4a90e2/ffffff?text=cardbg.jpg');
+            border: 2px solid #fff;
+        }
+        /* カードの表面 */
+        .card-front {
+            background-color: #FFFFFF;
+            transform: rotateY(180deg);
+        }
+        .symbol-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <h1 class="text-3xl font-bold text-white mb-6">カードめくり</h1>
+
+    <!-- カードを配置するゲームボード -->
+    <div id="game-board" class="grid grid-cols-1 gap-4">
+        <!-- カードはJavaScriptによってここに動的に生成されます -->
+    </div>
+
+    <button id="reset-button" class="mt-8 px-6 py-3 bg-green-500 text-white font-bold rounded-lg shadow-md hover:bg-green-600 transition-colors">
+        リセット
+    </button>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameBoard = document.getElementById('game-board');
+            const resetButton = document.getElementById('reset-button');
+
+            // カード絵柄のファイルパスを定義
+            // ★★★ ご自身のファイルパスに書き換えてください ★★★
+            const imagePaths = {
+                diamond: 'https://placehold.co/200x280/e0e0e0/000000?text=diamond.jpg',
+                medal: 'https://placehold.co/200x280/cd7f32/ffffff?text=medal.jpg',
+                coin: 'https://placehold.co/200x280/ffd700/000000?text=coin.jpg'
+            };
+
+            // カードの山（10枚）を定義
+            const initialDeck = [
+                'diamond', 'diamond', 'diamond', 'medal', 'medal', 'medal', 'coin', 'coin', 'coin', 'diamond'
+            ];
+
+            // カードのレイアウト（行ごとの枚数）
+            const layout = [2, 3, 3, 2];
+
+            function setupGame() {
+                gameBoard.innerHTML = '';
+                const shuffledDeck = [...initialDeck].sort(() => Math.random() - 0.5);
+                
+                let cardIndex = 0;
+                layout.forEach(count => {
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-center items-center gap-4';
+                    
+                    for (let i = 0; i < count; i++) {
+                        if (cardIndex < shuffledDeck.length) {
+                            const cardSymbol = shuffledDeck[cardIndex];
+                            
+                            const cardElement = document.createElement('div');
+                            cardElement.className = 'perspective w-24 h-36 md:w-28 md:h-44 cursor-pointer';
+                            
+                            cardElement.innerHTML = `
+                                <div class="card-inner">
+                                    <div class="card-face card-front">
+                                        <img src="${imagePaths[cardSymbol]}" alt="${cardSymbol}" class="symbol-image">
+                                    </div>
+                                    <div class="card-face card-back"></div>
+                                </div>
+                            `;
+                            
+                            cardElement.addEventListener('click', () => {
+                                if (!cardElement.classList.contains('is-flipped')) {
+                                    cardElement.classList.add('is-flipped');
+                                }
+                            });
+                            
+                            row.appendChild(cardElement);
+                            cardIndex++;
+                        }
+                    }
+                    gameBoard.appendChild(row);
+                });
+            }
+
+            resetButton.addEventListener('click', setupGame);
+
+            // ゲームを初期化
+            setupGame();
+        });
+    </script>
+
+</body>
+</html>
