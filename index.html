@@ -8,6 +8,14 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* bg-gray-800 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 1rem;
         }
         .perspective {
             perspective: 1000px;
@@ -69,15 +77,31 @@
         
         .slide-up {
             animation: slideUp 0.5s ease-out forwards;
+            transform: translateY(100vh); /* 初期位置を画面外に設定 */
         }
 
         @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
+            from { transform: translateY(100vh); opacity: 0; } /* 画面の高さを基準に画面外から開始 */
             to { transform: translateY(0); opacity: 1; }
+        }
+        
+        #game-board {
+            /* flexboxで中央寄せ */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .card-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
         }
     </style>
 </head>
-<body class="bg-gray-800 flex flex-col items-center justify-center min-h-screen p-4">
+<body>
 
     <!-- スタート画面 -->
     <div id="start-screen" class="flex flex-col items-center">
@@ -87,9 +111,9 @@
     </div>
 
     <!-- ゲーム画面 -->
-    <div id="game-screen" class="flex flex-col items-center hidden">
+    <div id="game-screen" class="hidden">
         <!-- カードを配置するゲームボード -->
-        <div id="game-board" class="grid grid-cols-1 gap-4 fade-in">
+        <div id="game-board" class="fade-in">
             <!-- カードはJavaScriptによってここに動的に生成されます -->
         </div>
 
@@ -189,7 +213,7 @@
                 let cardIndex = 0;
                 layout.forEach(count => {
                     const row = document.createElement('div');
-                    row.className = 'flex justify-center items-center gap-4';
+                    row.className = 'card-row';
                     
                     for (let i = 0; i < count; i++) {
                         if (cardIndex < shuffledDeck.length) {
