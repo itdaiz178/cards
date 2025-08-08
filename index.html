@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>カードめくりゲーム（画面遷移版）</title>
+    <title>カードめくりゲーム（効果音版）</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -120,6 +120,13 @@
                 { id: 'coin', image: 'https://placehold.co/200x280/ffd700/000000?text=coin.jpg', probability: 60 }
             ];
 
+            // 効果音のファイルパスを定義
+            // ★★★ ご自身のファイルパスに書き換えてください ★★★
+            const soundFiles = {
+                cardDeal: 'sounds/dealing_cards.mp3', // カードを配置する音
+                cardFlip: 'sounds/open_a_card.mp3' // カードをめくる音
+            };
+
             // カードのレイアウト（行ごとの枚数）
             const layout = [2, 3, 3, 2];
 
@@ -136,6 +143,14 @@
                     }
                 }
                 return cardSymbols[0];
+            }
+
+            // 効果音を再生する関数
+            function playSound(soundName) {
+                if (soundFiles[soundName]) {
+                    const audio = new Audio(soundFiles[soundName]);
+                    audio.play();
+                }
             }
 
             // ゲームのセットアップ
@@ -177,10 +192,18 @@
                                     <div class="card-face card-back"></div>
                                 </div>
                             `;
+
+                            // アニメーション開始時に効果音を再生
+                            cardElement.addEventListener('animationstart', (event) => {
+                                if (event.animationName === 'slideUp') {
+                                    playSound('cardDeal');
+                                }
+                            });
                             
                             cardElement.addEventListener('click', () => {
                                 if (!cardElement.classList.contains('is-flipped')) {
                                     cardElement.classList.add('is-flipped');
+                                    playSound('cardFlip'); // カードをめくる効果音を再生
                                     flippedCardCount++;
                                     // すべてのカードがめくられたかチェック
                                     if (flippedCardCount === totalCards) {
