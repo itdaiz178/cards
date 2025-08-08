@@ -46,9 +46,9 @@
         }
         /* カードの裏面 */
         .card-back {
-            background-image: url('https://itdaiz178.github.io/cards/images/card_back3.jpg');
+            background-image: url('https://itdaiz178.github.io/cards/images/card_back3.png');
             background-size: 100% 100%;
-            border: 3px solid #ddd;
+            border: 0px solid #ddd;
         }
         /* カードの表面 */
         .card-front {
@@ -100,6 +100,36 @@
             align-items: center;
             gap: 1rem;
         }
+        
+        /* URカードに適用する激しい光のエフェクト（めくった瞬間） */
+        .flash-burst {
+            animation: flash-burst-animation 0.5s forwards;
+        }
+        @keyframes flash-burst-animation {
+            0% {
+                box-shadow: 0 0 15px 15px rgba(255, 235, 0, 0);
+            }
+            50% {
+                box-shadow: 0 0 30px 30px rgba(255, 255, 0, 1);
+            }
+            100% {
+                box-shadow: 0 0 15px 15px rgba(255, 215, 0, 0.5);
+            }
+        }
+        
+        /* URカードに適用するぼんやり光るエフェクト（開いた後） */
+        .ur-glow {
+            box-shadow: 0 0 5px 3px rgba(255, 215, 0, 0.5);
+            animation: ur-glow-animation 1.5s infinite alternate;
+        }
+        @keyframes ur-glow-animation {
+            from {
+                box-shadow: 0 0 5px 3px rgba(255, 215, 0, 0.5);
+            }
+            to {
+                box-shadow: 0 0 10px 5px rgba(255, 215, 0, 0.8);
+            }
+        }
     </style>
 </head>
 <body>
@@ -138,11 +168,13 @@
             let audioContext;
             let soundBuffers = {};
 
-            // カード絵柄、画像、出現確率を定義
+            // カード絵柄、画像、出現確率、ランクを定義
+            // ランク4=UR, 3=SSR, 2=SR, 1=R
             const cardSymbols = [
-                { id: 'ur_cat', image: 'https://itdaiz178.github.io/cards/images/card_ur_cat2.png', probability: 10 },
-                { id: 'ur_medal', image: 'https://itdaiz178.github.io/cards/images/card_ur_medal.png', probability: 30 },
-                { id: 'coin', image: 'https://placehold.co/200x280/ffd700/000000?text=coin.jpg', probability: 60 }
+                { id: 'ur_cat', image: 'https://itdaiz178.github.io/cards/images/card_ur_cat2.png', probability: 10, rank: 4 },
+                { id: 'ur_medal', image: 'https://itdaiz178.github.io/cards/images/card_ur_medal.png', probability: 20, rank: 4 },
+                { id: 'ssr_crystal', image: 'https://itdaiz178.github.io/cards/images/card_ssr_crystal.png', probability: 30, rank: 3 },
+                { id: 'coin', image: 'https://placehold.co/200x280/ffd700/000000?text=coin.jpg', probability: 40, rank: 2 }
             ];
 
             // 効果音のファイルパスを定義
@@ -224,6 +256,8 @@
                             // slide-upアニメーションを適用
                             cardElement.className = 'perspective w-24 h-36 md:w-28 md:h-44 cursor-pointer slide-up';
                             cardElement.style.animationDelay = `${cardIndex * 0.1}s`; // アニメーションに遅延を付けて順番に出現させる
+                            // カードのランクをデータ属性として保存
+                            cardElement.dataset.rank = cardSymbol.rank;
 
                             cardElement.innerHTML = `
                                 <div class="card-inner">
@@ -246,6 +280,23 @@
                                     cardElement.classList.add('is-flipped');
                                     playSound('cardFlip'); // カードをめくる効果音を再生
                                     flippedCardCount++;
+
+                                    // rankが4のカードをめくった際に光るエフェクトを追加
+                                    if (parseInt(cardElement.dataset.rank) === 4) {
+                                        const cardFront = cardElement.querySelector('.card-front');
+                                        if (cardFront) {
+                                            // めくった瞬間に激しい光のアニメーションを開始
+                                            cardFront.classList.add('flash-burst');
+                                            // アニメーション終了後にぼんやり光るアニメーションに切り替える
+                                            cardFront.addEventListener('animationend', (e) => {
+                                                if (e.animationName === 'flash-burst-animation') {
+                                                    cardFront.classList.remove('flash-burst');
+                                                    cardFront.classList.add('ur-glow');
+                                                }
+                                            }, { once: true }); // 一度だけ実行
+                                        }
+                                    }
+
                                     // すべてのカードがめくられたかチェック
                                     if (flippedCardCount === totalCards) {
                                         setTimeout(() => {
@@ -283,5 +334,3 @@
 
 </body>
 </html>
-
-
