@@ -41,12 +41,13 @@
             justify-content: center;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-size: cover;
+            background-size: 100% 100%;
             background-position: center;
         }
         /* カードの裏面 */
         .card-back {
             background-image: url('https://itdaiz178.github.io/cards/images/card_back3.jpg');
+            background-size: 100% 100%;
             border: 3px solid #ddd;
         }
         /* カードの表面 */
@@ -139,7 +140,7 @@
 
             // カード絵柄、画像、出現確率を定義
             const cardSymbols = [
-                { id: 'ur_cat', image: 'https://itdaiz178.github.io/cards/images/card_ur_cat.png', probability: 10 },
+                { id: 'ur_cat', image: 'https://itdaiz178.github.io/cards/images/card_ur_cat2.png', probability: 10 },
                 { id: 'ur_medal', image: 'https://itdaiz178.github.io/cards/images/card_ur_medal.png', probability: 30 },
                 { id: 'coin', image: 'https://placehold.co/200x280/ffd700/000000?text=coin.jpg', probability: 60 }
             ];
@@ -282,4 +283,5 @@
 
 </body>
 </html>
+
 
