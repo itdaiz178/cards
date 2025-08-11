@@ -130,6 +130,36 @@
                 box-shadow: 0 0 10px 5px rgba(255, 215, 0, 0.8);
             }
         }
+
+        /* SSRカードに適用する激しい光のエフェクト（めくった瞬間） */
+        .ssr-flash-burst {
+            animation: ssr-flash-burst-animation 0.5s forwards;
+        }
+        @keyframes ssr-flash-burst-animation {
+            0% {
+                box-shadow: 0 0 15px 15px rgba(200, 150, 255, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px 30px rgba(200, 150, 255, 1);
+            }
+            100% {
+                box-shadow: 0 0 15px 15px rgba(150, 100, 255, 0.5);
+            }
+        }
+        
+        /* SSRカードに適用するぼんやり光るエフェクト（開いた後） */
+        .ssr-glow {
+            box-shadow: 0 0 5px 3px rgba(150, 100, 255, 0.5);
+            animation: ssr-glow-animation 1.5s infinite alternate;
+        }
+        @keyframes ssr-glow-animation {
+            from {
+                box-shadow: 0 0 5px 3px rgba(150, 100, 255, 0.5);
+            }
+            to {
+                box-shadow: 0 0 10px 5px rgba(150, 100, 255, 0.8);
+            }
+        }
     </style>
 </head>
 <body>
@@ -283,19 +313,26 @@
                                     playSound('cardFlip'); // カードをめくる効果音を再生
                                     flippedCardCount++;
 
-                                    // rankが4のカードをめくった際に光るエフェクトを追加
-                                    if (parseInt(cardElement.dataset.rank) === 4) {
-                                        const cardFront = cardElement.querySelector('.card-front');
-                                        if (cardFront) {
-                                            // めくった瞬間に激しい光のアニメーションを開始
+                                    const cardFront = cardElement.querySelector('.card-front');
+                                    if (cardFront) {
+                                        const rank = parseInt(cardElement.dataset.rank);
+                                        // ランクによって適用するアニメーションを切り替える
+                                        if (rank === 4) {
                                             cardFront.classList.add('flash-burst');
-                                            // アニメーション終了後にぼんやり光るアニメーションに切り替える
                                             cardFront.addEventListener('animationend', (e) => {
                                                 if (e.animationName === 'flash-burst-animation') {
                                                     cardFront.classList.remove('flash-burst');
                                                     cardFront.classList.add('ur-glow');
                                                 }
-                                            }, { once: true }); // 一度だけ実行
+                                            }, { once: true });
+                                        } else if (rank === 3) {
+                                            cardFront.classList.add('ssr-flash-burst');
+                                            cardFront.addEventListener('animationend', (e) => {
+                                                if (e.animationName === 'ssr-flash-burst-animation') {
+                                                    cardFront.classList.remove('ssr-flash-burst');
+                                                    cardFront.classList.add('ssr-glow');
+                                                }
+                                            }, { once: true });
                                         }
                                     }
 
