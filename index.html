@@ -36,30 +36,36 @@
             height: 100%;
             -webkit-backface-visibility: hidden; /* Safari */
             backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-size: 100% 100%;
-            background-position: center;
+            overflow: hidden; /* 背景画像がはみ出ないように */
         }
         /* カードの裏面 */
         .card-back {
-            background-image: url('https://itdaiz178.github.io/cards/images/card_back3.png');
-            background-size: 100% 100%;
-            border: 0px solid #ddd;
+            background-image: url('https://itdaiz178.github.io/cards/images/card_back.png');
+            background-size: cover; /* 画像が全体を覆うように修正 */
+            background-position: center;
         }
         /* カードの表面 */
         .card-front {
-            background-color: #FFFFFF;
             transform: rotateY(180deg);
+            background-size: cover;
+            background-position: center;
+            /* Flexboxで中央寄せする */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .symbol-image {
+            /* 親要素のFlexboxで中央寄せするため、絶対配置を削除 */
+            /* position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); */
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            border-radius: 0.75rem;
+            object-fit: contain;
+            z-index: 10;
         }
 
         /* アニメーション用のスタイル */
@@ -200,13 +206,20 @@
             let audioContext;
             let soundBuffers = {};
 
+            // ランクごとに背景画像を定義 (ユーザーが手動で修正した.jpgに更新)
+            const backgroundImages = {
+                4: 'https://itdaiz178.github.io/cards/images/card_bg_ur.jpg', // UR
+                3: 'https://itdaiz178.github.io/cards/images/card_bg_ssr.jpg', // SSR
+                2: 'https://itdaiz178.github.io/cards/images/card_bg_sr.jpg', // SR
+                1: 'https://itdaiz178.github.io/cards/images/card_bg_r.jpg', // R
+            };
+
             // カード絵柄、画像、出現確率、ランクを定義
-            // ランク4=UR, 3=SSR, 2=SR, 1=R
             const cardSymbols = [
-                { id: 'ur_cat', image: 'https://itdaiz178.github.io/cards/images/card_ur_cat2.png', probability: 10, rank: 4 },
-                { id: 'ur_medal', image: 'https://itdaiz178.github.io/cards/images/card_ur_medal.png', probability: 20, rank: 4 },
-                { id: 'ssr_crystal', image: 'https://itdaiz178.github.io/cards/images/card_ssr_crystal.png', probability: 30, rank: 3 },
-                { id: 'coin', image: 'https://placehold.co/200x280/ffd700/000000?text=coin.jpg', probability: 40, rank: 2 }
+                { id: 'ur_giraffe', image: 'https://itdaiz178.github.io/cards/images/card_ur_giraffe.png', probability: 10, rank: 4 },
+                { id: 'ssr_cat', image: 'https://itdaiz178.github.io/cards/images/card_ssr_cat.png', probability: 20, rank: 3 },
+                { id: 'sr_medal', image: 'https://itdaiz178.github.io/cards/images/card_sr_medal.png', probability: 20, rank: 2 },
+                { id: 'r_crystal', image: 'https://itdaiz178.github.io/cards/images/card_r_crystal.png', probability: 30, rank: 1 },
             ];
 
             // 効果音のファイルパスを定義
@@ -291,9 +304,13 @@
                             // カードのランクをデータ属性として保存
                             cardElement.dataset.rank = cardSymbol.rank;
 
+                            // ランクに基づいて背景画像URLを取得
+                            const cardBackground = backgroundImages[cardSymbol.rank];
+
+                            // カードの前面に背景とキャラクター画像を重ねて表示
                             cardElement.innerHTML = `
                                 <div class="card-inner">
-                                    <div class="card-face card-front">
+                                    <div class="card-face card-front" style="background-image: url(${cardBackground});">
                                         <img src="${cardSymbol.image}" alt="${cardSymbol.id}" class="symbol-image">
                                     </div>
                                     <div class="card-face card-back"></div>
